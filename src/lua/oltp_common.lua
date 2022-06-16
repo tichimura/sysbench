@@ -509,7 +509,20 @@ local function execute_range(key)
       param[tnum][key][1]:set(id)
       param[tnum][key][2]:set(id + sysbench.opt.range_size - 1)
 
-      stmt[tnum][key]:execute()
+      if key == "simple_ranges" then
+        range_query = string.format("select c from sbtest%s where id between %s and %s",tnum,id, id + sysbench.opt.range_size - 1)
+      elseif key == "sum_ranges" then
+        range_query = string.format("select sum(k) from sbtest%s where id between %s and %s",tnum,id, id + sysbench.opt.range_size - 1)
+      elseif key == "order_ranges" then
+        local range_query = string.format("select c from sbtest%s where id between %s and %s order by c",tnum,id, id + sysbench.opt.range_size - 1)
+      elseif key == "distinct_ranges" then
+        local range_query = string.format("select distinct c from sbtest%s where id between %s and %s order by c",tnum,id, id + sysbench.opt.range_size - 1)
+      end
+
+      -- print(string.format("Query for %s is: %s",key,range_query))
+      con:query(range_query)
+      --stmt[tnum][key]:execute()
+
    end
 end
 
